@@ -77,11 +77,12 @@ func (c *Cmd) get() (err error) {
 		p = options[0]
 	}
 	p = cleanPath(p)
-	value, stat, err := c.Conn.Get(p)
+	value, _, err := c.Conn.Get(p)
 	if err != nil {
 		return
 	}
-	fmt.Printf("%+v\n%s\n", string(value), fmtStat(stat))
+	//fmt.Printf("%+v\n%s\n", string(value), fmtStat(stat))
+	fmt.Printf("%+v\n", string(value))
 	return
 }
 
