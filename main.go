@@ -8,12 +8,21 @@ import (
 
 	"github.com/c-bata/go-prompt"
 	"github.com/let-us-go/zkcli/core"
+	"log"
 )
 
 var gitCommit = "unknown"
 var built = "unknown"
 
 const version = "0.2.0"
+
+type NewLogger struct{
+	debugLog log.Logger
+}
+
+func (nl NewLogger) Printf(format string, a ...interface{}) {
+	nl.debugLog.Printf(format, a...)
+}
 
 func main() {
 	servers := flag.String("s", "127.0.0.1:2181", "Servers")
@@ -22,6 +31,7 @@ func main() {
 	showVersion := flag.Bool("version", false, "Show version info")
 	flag.Parse()
 	args := flag.Args()
+	//fmt.Println(args)
 
 	if *showVersion {
 		fmt.Printf("Version:\t%s\nGit commit:\t%s\nBuilt: %s\n",
@@ -37,6 +47,11 @@ func main() {
 		config.Auth = auth
 	}
 	conn, err := config.Connect()
+	logFile,err  := os.Create("/tmp/zkcli.log")
+	defer logFile.Close()
+	fileLog := log.New(logFile,"[Debug]",log.LstdFlags)
+	newLogger := NewLogger{debugLog: *fileLog}
+	conn.SetLogger(newLogger)
 	if err != nil {
 		fmt.Printf("%s\n", err)
 		os.Exit(1)
