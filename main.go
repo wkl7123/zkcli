@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
 	"github.com/c-bata/go-prompt"
-	"github.com/let-us-go/zkcli/core"
+	"github.com/wkl7123/zkcli/core"
 	"log"
 )
 
