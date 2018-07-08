@@ -128,12 +128,8 @@ func (c *Cmd) set() (err error) {
 		}
 	}
 	cleanPath(p)
-	stat, err := c.Conn.Set(p, []byte(data), -1)
-	if err != nil {
-		return
-	}
-	fmt.Printf("%s\n", fmtStat(stat))
-	return
+	_, err = c.Conn.Set(p, []byte(data), -1)
+	return err
 }
 
 func (c *Cmd) delete() (err error) {
@@ -244,6 +240,11 @@ func (c *Cmd) run() (err error) {
 		return c.connect()
 	case "addauth":
 		return c.addAuth()
+	case "help":
+		printHelp()
+		return nil
+	case "":
+		return nil
 	default:
 		return ErrUnknownCmd
 	}
@@ -253,7 +254,7 @@ func (c *Cmd) Run() {
 	err := c.run()
 	if err != nil {
 		if err == ErrUnknownCmd {
-			printHelp()
+			printUnsupported()
 			if c.ExitWhenErr {
 				os.Exit(2)
 			}
@@ -266,16 +267,20 @@ func (c *Cmd) Run() {
 	}
 }
 
+func printUnsupported() {
+	fmt.Println("error: unsupported command, use 'help' to know more")
+}
+
 func printHelp() {
-	fmt.Println(`get <path>
-ls <path>
-create <path> [<data>]
-set <path> [<data>]
-delete <path>
-connect <host:port>
-addauth <scheme> <auth>
-close
-exit`)
+	fmt.Println(`    ls <path>
+    get <path>
+    set <path> [<data>]
+    create <path> [<data>]
+    delete <path>
+    connect <host:port>
+    addauth <scheme> <auth>
+    close
+    exit`)
 }
 
 func printRunError(err error) {
