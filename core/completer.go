@@ -42,7 +42,8 @@ func argumentsCompleter(args []string, cmd *Cmd) []prompt.Suggest {
 	first := args[0]
 	switch first {
 	case "get", "ls", "create", "set", "delete":
-		p := strings.TrimSuffix(args[1], "/")
+		//p := strings.TrimSuffix(args[1], "/")
+		p := args[1]
 		if len(args) > 2 {
 			switch first {
 			case "create", "set":
