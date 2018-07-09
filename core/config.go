@@ -12,11 +12,13 @@ import (
 type Config struct {
 	Servers []string
 	Auth    *Auth
+	HistoryFilePath string
 }
 
-func NewConfig(Servers []string) *Config {
+func NewConfig(Servers []string, HistoryFilePath string) *Config {
 	return &Config{
 		Servers: Servers,
+		HistoryFilePath: HistoryFilePath,
 	}
 }
 

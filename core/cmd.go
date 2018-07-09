@@ -46,6 +46,22 @@ func ParseCmd(cmd string) (name string, options []string) {
 	return args[0], args[1:]
 }
 
+func (c *Cmd) addHistory() {
+	f, err := os.OpenFile(c.Config.HistoryFilePath, os.O_APPEND|os.O_RDWR, 0600)
+	if err != nil {
+		panic(err)
+	}
+
+	defer f.Close()
+
+	output := c.Name
+	for _, elem := range c.Options {
+		output += " " + elem
+	}
+	f.WriteString(output + "\n")
+
+}
+
 func (c *Cmd) ls() (err error) {
 	err = c.checkConn()
 	if err != nil {
@@ -106,9 +122,9 @@ func (c *Cmd) getToFile() (err error) {
 	if err != nil {
 		return
 	}
-	fd,err := os.Create(path)
+	fd, err := os.Create(path)
 	defer fd.Close()
-	_,err = fd.Write(value)
+	_, err = fd.Write(value)
 	if err == nil {
 		fmt.Println("ok")
 	}
@@ -183,8 +199,6 @@ func (c *Cmd) setFromFile() (err error) {
 	return err
 }
 
-
-
 func (c *Cmd) delete() (err error) {
 	err = c.checkConn()
 	if err != nil {
@@ -224,7 +238,7 @@ func (c *Cmd) connect() (err error) {
 	options := c.Options
 	var conn *zk.Conn
 	if len(options) > 0 {
-		cf := NewConfig(strings.Split(options[0], ","))
+		cf := NewConfig(strings.Split(options[0], ","), c.Config.HistoryFilePath)
 		conn, err = cf.Connect()
 		if err != nil {
 			return err
@@ -278,26 +292,37 @@ func (c *Cmd) checkConn() (err error) {
 func (c *Cmd) run() (err error) {
 	switch c.Name {
 	case "ls":
+		c.addHistory()
 		return c.ls()
 	case "get":
+		c.addHistory()
 		return c.get()
 	case "getToFile":
+		c.addHistory()
 		return c.getToFile()
 	case "setFromFile":
+		c.addHistory()
 		return c.setFromFile()
 	case "create":
+		c.addHistory()
 		return c.create()
 	case "set":
+		c.addHistory()
 		return c.set()
 	case "delete":
+		c.addHistory()
 		return c.delete()
 	case "close":
+		c.addHistory()
 		return c.close()
 	case "connect":
+		c.addHistory()
 		return c.connect()
 	case "addauth":
+		c.addHistory()
 		return c.addAuth()
 	case "help":
+		c.addHistory()
 		printHelp()
 		return nil
 	case "":
