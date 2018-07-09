@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/samuel/go-zookeeper/zk"
+	"io/ioutil"
 )
 
 const flag int32 = 0
@@ -86,6 +87,32 @@ func (c *Cmd) get() (err error) {
 	return
 }
 
+func (c *Cmd) getToFile() (err error) {
+	err = c.checkConn()
+	if err != nil {
+		return
+	}
+
+	p := "/"
+	options := c.Options
+	if len(options) != 2 {
+		return
+	}
+
+	p = options[0]
+	p = cleanPath(p)
+	path := options[1]
+	value, _, err := c.Conn.Get(p)
+	if err != nil {
+		return
+	}
+	fd,err := os.Create(path)
+	defer fd.Close()
+	fd.Write(value)
+	fmt.Printf("%+v\n", string(value))
+	return
+}
+
 func (c *Cmd) create() (err error) {
 	err = c.checkConn()
 	if err != nil {
@@ -131,6 +158,28 @@ func (c *Cmd) set() (err error) {
 	_, err = c.Conn.Set(p, []byte(data), -1)
 	return err
 }
+
+func (c *Cmd) setFromFile() (err error) {
+	err = c.checkConn()
+	if err != nil {
+		return
+	}
+
+	options := c.Options
+	if len(options) != 2 {
+		return
+	}
+
+	p := options[0]
+	filePath := options[1]
+	data, err := ioutil.ReadFile(filePath)
+	fmt.Println(data)
+	cleanPath(p)
+	_, err = c.Conn.Set(p, []byte(data), -1)
+	return err
+}
+
+
 
 func (c *Cmd) delete() (err error) {
 	err = c.checkConn()
@@ -228,6 +277,10 @@ func (c *Cmd) run() (err error) {
 		return c.ls()
 	case "get":
 		return c.get()
+	case "getToFile":
+		return c.getToFile()
+	case "setFromFile":
+		return c.setFromFile()
 	case "create":
 		return c.create()
 	case "set":
