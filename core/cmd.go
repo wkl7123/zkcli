@@ -322,7 +322,6 @@ func (c *Cmd) run() (err error) {
 		c.addHistory()
 		return c.addAuth()
 	case "help":
-		c.addHistory()
 		printHelp()
 		return nil
 	case "":
