@@ -108,8 +108,10 @@ func (c *Cmd) getToFile() (err error) {
 	}
 	fd,err := os.Create(path)
 	defer fd.Close()
-	fd.Write(value)
-	fmt.Printf("%+v\n", string(value))
+	_,err = fd.Write(value)
+	if err == nil {
+		fmt.Println("ok")
+	}
 	return
 }
 
@@ -173,9 +175,11 @@ func (c *Cmd) setFromFile() (err error) {
 	p := options[0]
 	filePath := options[1]
 	data, err := ioutil.ReadFile(filePath)
-	fmt.Println(data)
 	cleanPath(p)
 	_, err = c.Conn.Set(p, []byte(data), -1)
+	if err == nil {
+		fmt.Println("ok")
+	}
 	return err
 }
 
