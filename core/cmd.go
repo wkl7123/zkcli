@@ -356,6 +356,8 @@ func printHelp() {
 	fmt.Println(`    ls <path>
     get <path>
     set <path> [<data>]
+	getToFile <path> <filePath>
+	setFromFile <path> <filePath>
     create <path> [<data>]
     delete <path>
     connect <host:port>

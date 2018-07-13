@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/c-bata/go-prompt"
+	"io/ioutil"
 )
 
 var commands = []prompt.Suggest{
@@ -42,7 +43,6 @@ func argumentsCompleter(args []string, cmd *Cmd) []prompt.Suggest {
 	first := args[0]
 	switch first {
 	case "get", "ls", "create", "set", "delete":
-		//p := strings.TrimSuffix(args[1], "/")
 		p := args[1]
 		if len(args) > 2 {
 			switch first {
@@ -79,18 +79,39 @@ func argumentsCompleter(args []string, cmd *Cmd) []prompt.Suggest {
 			{Text: "digest"},
 		}, scheme, true)
 	case "getToFile", "setFromFile":
-		if len(args) > 2 {
-			return []prompt.Suggest{
-				{Text: "filePath"},
-			}
+		if len(args) == 3 {
+			fmt.Print(args[2])
+			return prompt.FilterContains(getPathCompletions(args[2]), strings.TrimSuffix(args[2], "/"), true)
+		} else if len(args) == 2 {
+			p := strings.TrimSuffix(args[1], "/")
+			root, _ := splitPath(p)
+			return prompt.FilterContains(getChildrenCompletions(cmd, root), p, true)
+		} else {
+			return []prompt.Suggest{}
 		}
-		p := strings.TrimSuffix(args[1], "/")
-		root, _ := splitPath(p)
-		return prompt.FilterContains(getChildrenCompletions(cmd, root), p, true)
+
 	default:
 		return []prompt.Suggest{}
 	}
 	return []prompt.Suggest{}
+}
+
+func getPathCompletions(root string) []prompt.Suggest {
+	directory, _ := path.Split(root)
+	list, _ := ioutil.ReadDir(directory)
+	s := make([]prompt.Suggest, len(list))
+	for key, value := range list {
+		p := "/"
+		if root == "/" {
+			p = fmt.Sprintf("/%s", value.Name())
+		} else {
+			p = fmt.Sprintf("%s%s", directory, value.Name())
+		}
+		s[key] = prompt.Suggest{
+			Text: p,
+		}
+	}
+	return s
 }
 
 func getChildrenCompletions(cmd *Cmd, root string) []prompt.Suggest {
