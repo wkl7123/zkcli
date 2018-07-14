@@ -369,7 +369,7 @@ func printUnsupported() {
 
 func printHelp() {
 	fmt.Println(`    ls <path>
-    get <path>
+    get <path> <field[/<subField>][/<subField]>
     set <path> [<data>]
 	gf <path> <filePath>
 	sf <path> <filePath>

@@ -20,7 +20,7 @@ brew install zkcli
 ### go install
 
 ```
-go install github.com/let-us-go/zkcli
+go install github.com/wkl7123/zkcli
 ```
 
 ### Build
@@ -28,8 +28,6 @@ go install github.com/let-us-go/zkcli
 ```
 make release-all
 ```
-
-Or [download a pre-built binary](https://github.com/let-us-go/zkcli/releases) for Linux or macOS/OSX.
 
 
 ## Usage
@@ -43,10 +41,12 @@ $ zkcli ls /test
 $ zkcli
 >>> 
 >>> help
-get <path>
 ls <path>
-create <path> [<data>]
+get <path> <field[/<subField>][/<subField]>
 set <path> [<data>]
+gf <path> <filePath>
+sf <path> <filePath>
+create <path> [<data>]
 delete <path>
 connect <host:port>
 addauth <scheme> <auth>
