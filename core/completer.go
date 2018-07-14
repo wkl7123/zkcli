@@ -5,8 +5,10 @@ import (
 	"path"
 	"strings"
 
+	"encoding/json"
 	"github.com/c-bata/go-prompt"
 	"io/ioutil"
+	"reflect"
 )
 
 var commands = []prompt.Suggest{
@@ -24,6 +26,7 @@ var commands = []prompt.Suggest{
 }
 
 var suggestCache = newSuggestCache()
+//var jsonPathCache = newSuggestCache()
 
 func GetCompleter(cmd *Cmd) func(d prompt.Document) []prompt.Suggest {
 	return func(d prompt.Document) []prompt.Suggest {
@@ -52,6 +55,8 @@ func argumentsCompleter(args []string, cmd *Cmd) []prompt.Suggest {
 						{Text: "data"},
 					}
 				}
+			case "get":
+				return prompt.FilterContains(getJsonCompletions(cmd, args[1], args[2]), args[2], true)
 			default:
 				return []prompt.Suggest{}
 			}
@@ -112,6 +117,55 @@ func getPathCompletions(root string) []prompt.Suggest {
 		}
 	}
 	return s
+}
+
+func getJsonCompletions(cmd *Cmd, path string, jsonPath string) []prompt.Suggest {
+	//if value, ok := jsonPathCache.get(root); ok {
+	//	return value
+	//}
+
+	if !cmd.connected() {
+		return []prompt.Suggest{}
+	}
+
+	value, _, err := cmd.Conn.Get(path)
+	if err != nil {
+		return []prompt.Suggest{}
+	}
+	var j interface{}
+
+	err = json.Unmarshal(value, &j)
+	if err != nil {
+		return []prompt.Suggest{}
+	}
+
+	jm := j.(map[string]interface{})
+	root, _ := splitPath(strings.Trim(jsonPath, "/"))
+	rootArgs := strings.Split(root, "/")
+	if len(rootArgs) >= 1 {
+		for _, arg := range rootArgs {
+			if value, ok := jm[arg]; ok {
+				jm = value.(map[string]interface{})
+			} else {
+				return []prompt.Suggest{}
+			}
+		}
+	}
+
+
+	keys := reflect.ValueOf(jm).MapKeys()
+	s := make([]prompt.Suggest, len(keys))
+	ss := make([]string, len(keys))
+	for i := 0; i < len(keys); i++ {
+		s[i] = prompt.Suggest{
+			Text: "/" + root + "/" + keys[i].String(),
+		}
+		ss[i] = "/" + root + "/" + keys[i].String()
+	}
+	fmt.Print("\n")
+	fmt.Println(ss)
+	return s
+
 }
 
 func getChildrenCompletions(cmd *Cmd, root string) []prompt.Suggest {
