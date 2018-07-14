@@ -103,7 +103,7 @@ func (c *Cmd) get() (err error) {
 	return
 }
 
-func (c *Cmd) getToFile() (err error) {
+func (c *Cmd) gf() (err error) {
 	err = c.checkConn()
 	if err != nil {
 		return
@@ -177,7 +177,7 @@ func (c *Cmd) set() (err error) {
 	return err
 }
 
-func (c *Cmd) setFromFile() (err error) {
+func (c *Cmd) sf() (err error) {
 	err = c.checkConn()
 	if err != nil {
 		return
@@ -297,12 +297,12 @@ func (c *Cmd) run() (err error) {
 	case "get":
 		c.addHistory()
 		return c.get()
-	case "getToFile":
+	case "gf":
 		c.addHistory()
-		return c.getToFile()
-	case "setFromFile":
+		return c.gf()
+	case "sf":
 		c.addHistory()
-		return c.setFromFile()
+		return c.sf()
 	case "create":
 		c.addHistory()
 		return c.create()
@@ -356,8 +356,8 @@ func printHelp() {
 	fmt.Println(`    ls <path>
     get <path>
     set <path> [<data>]
-	getToFile <path> <filePath>
-	setFromFile <path> <filePath>
+	gf <path> <filePath>
+	sf <path> <filePath>
     create <path> [<data>]
     delete <path>
     connect <host:port>

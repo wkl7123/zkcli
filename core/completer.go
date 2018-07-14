@@ -10,12 +10,12 @@ import (
 )
 
 var commands = []prompt.Suggest{
-	{Text: "get", Description: "Get data"},
-	{Text: "getToFile", Description: "Get data and write to file"},
 	{Text: "ls", Description: "List children"},
-	{Text: "create", Description: "Create a node"},
+	{Text: "get", Description: "Get data"},
+	{Text: "gf", Description: "Write content to file"},
 	{Text: "set", Description: "Update a node"},
-	{Text: "setFromFile", Description: "Update a node by data from file"},
+	{Text: "sf", Description: "Set content from file"},
+	{Text: "create", Description: "Create a node"},
 	{Text: "delete", Description: "Delete a node"},
 	{Text: "close", Description: "Close connection"},
 	{Text: "connect", Description: "Connect servers"},
@@ -78,7 +78,7 @@ func argumentsCompleter(args []string, cmd *Cmd) []prompt.Suggest {
 		return prompt.FilterContains([]prompt.Suggest{
 			{Text: "digest"},
 		}, scheme, true)
-	case "getToFile", "setFromFile":
+	case "gf", "sf":
 		if len(args) == 3 {
 			fmt.Print(args[2])
 			return prompt.FilterContains(getPathCompletions(args[2]), strings.TrimSuffix(args[2], "/"), true)
