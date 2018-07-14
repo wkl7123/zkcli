@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"github.com/samuel/go-zookeeper/zk"
 	"io/ioutil"
+	"reflect"
 )
 
 const flag int32 = 0
@@ -102,15 +103,27 @@ func (c *Cmd) get() (err error) {
 
 	if len(options) >= 2 {
 		var j interface{}
-		json.Unmarshal(value, &j)
+		er := json.Unmarshal(value, &j)
+		if er != nil {
+			fmt.Println("not a valid json structure")
+			return
+		}
 		jm := j.(map[string]interface{})
 		fields := strings.Split(strings.Trim(options[1], "/"), "/")
 		n := 0
 		for n <= len(fields)-2 {
+			if reflect.TypeOf(jm[fields[n]]).String() == "string" {
+				fmt.Println("wrong path")
+				return
+			}
 			jm = (jm[fields[n]]).(map[string]interface{})
 			n += 1
 		}
-		jsonStr,_ := json.MarshalIndent(jm[fields[n]], "", "    ")
+		jsonStr, e := json.MarshalIndent(jm[fields[n]], "", "    ")
+		if e != nil {
+			fmt.Println(e.Error())
+			return
+		}
 		fmt.Println(string(jsonStr))
 		return
 	}
