@@ -33,7 +33,6 @@ func main() {
 	showVersion := flag.Bool("version", false, "Show version info")
 	flag.Parse()
 	args := flag.Args()
-	//fmt.Println(args)
 
 	if *showVersion {
 		fmt.Printf("Version:\t%s\nGit commit:\t%s\nBuilt: %s\n",

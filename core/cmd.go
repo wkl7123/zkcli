@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"encoding/json"
 	"github.com/samuel/go-zookeeper/zk"
 	"io/ioutil"
 )
@@ -98,7 +99,21 @@ func (c *Cmd) get() (err error) {
 	if err != nil {
 		return
 	}
-	//fmt.Printf("%+v\n%s\n", string(value), fmtStat(stat))
+
+	if len(options) >= 2 {
+		var j interface{}
+		json.Unmarshal(value, &j)
+		jm := j.(map[string]interface{})
+		fields := strings.Split(strings.Trim(options[1], "/"), "/")
+		n := 0
+		for n <= len(fields)-2 {
+			jm = (jm[fields[n]]).(map[string]interface{})
+			n += 1
+		}
+		jsonStr,_ := json.MarshalIndent(jm[fields[n]], "", "    ")
+		fmt.Println(string(jsonStr))
+		return
+	}
 	fmt.Printf("%+v\n", string(value))
 	return
 }
