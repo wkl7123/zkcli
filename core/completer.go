@@ -140,8 +140,19 @@ func getJsonCompletions(cmd *Cmd, path string, jsonPath string) []prompt.Suggest
 	}
 
 	jm := j.(map[string]interface{})
-	root, _ := splitPath(strings.Trim(jsonPath, "/"))
-	rootArgs := strings.Split(root, "/")
+	root, _ := splitPath(jsonPath)
+	if root == "/" {
+		keys := reflect.ValueOf(jm).MapKeys()
+		s := make([]prompt.Suggest, len(keys))
+		for i := 0; i < len(keys); i++ {
+			s[i] = prompt.Suggest{
+				Text: "/" + keys[i].String(),
+			}
+		}
+		return s
+	}
+
+	rootArgs := strings.Split(strings.Trim(root, "/"), "/")
 	if len(rootArgs) >= 1 {
 		for _, arg := range rootArgs {
 			if value, ok := jm[arg]; ok {
@@ -158,9 +169,9 @@ func getJsonCompletions(cmd *Cmd, path string, jsonPath string) []prompt.Suggest
 	ss := make([]string, len(keys))
 	for i := 0; i < len(keys); i++ {
 		s[i] = prompt.Suggest{
-			Text: "/" + root + "/" + keys[i].String(),
+			Text: root + "/" + keys[i].String(),
 		}
-		ss[i] = "/" + root + "/" + keys[i].String()
+		ss[i] = root + "/" + keys[i].String()
 	}
 	fmt.Print("\n")
 	fmt.Println(ss)
