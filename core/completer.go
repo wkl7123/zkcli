@@ -166,15 +166,11 @@ func getJsonCompletions(cmd *Cmd, path string, jsonPath string) []prompt.Suggest
 
 	keys := reflect.ValueOf(jm).MapKeys()
 	s := make([]prompt.Suggest, len(keys))
-	ss := make([]string, len(keys))
 	for i := 0; i < len(keys); i++ {
 		s[i] = prompt.Suggest{
 			Text: root + "/" + keys[i].String(),
 		}
-		ss[i] = root + "/" + keys[i].String()
 	}
-	fmt.Print("\n")
-	fmt.Println(ss)
 	return s
 
 }
