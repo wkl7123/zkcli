@@ -27,7 +27,7 @@ func main() {
 	logFilePath := ".zkcli.log"
 	historyFilePath := ".zkcli.history"
 
-	servers := flag.String("s", "172.18.33.171:2182", "Servers")
+	servers := flag.String("s", "172.22.33.130:2181", "Servers")
 	username := flag.String("u", "", "Username")
 	password := flag.String("p", "", "Password")
 	showVersion := flag.Bool("version", false, "Show version info")
